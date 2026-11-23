@@ -1,4 +1,4 @@
-# Planting Guide: factors and fields (v0.2)
+# Planting Guide: factors and fields (v0.4)
 
 This is the final factor and field list for phase 2. The data itself lives inside `index.html`, in the `<script id="pgdata">` block. It covers 50 plants, 30 pests and diseases, 54 pair rules and 16 tools.
 
@@ -43,31 +43,32 @@ Here is what it would take:
 
 Once enough logs exist, fitted weights replace the ones in the table above.
 
-## 2. Placement checks (why a ring is red, amber or green)
+## 2. Ring (placement) and flag (conditions)
 
-Each check runs at the slider's week. The ring takes the color of the worst result, and grey means the plant is not in the ground that week.
+From v0.4 each placed plant shows two separate signals, both checked at the slider's week. Grey means the plant is not in the ground that week.
 
-| Check | Red | Amber |
+**Ring (placement).** The ring changes only with where the plant sits.
+
+| | Red | Amber |
 |---|---|---|
-| Frost | Tender plant out before last frost | Half-hardy plant out more than 4 weeks early |
-| Season length | — | Can't mature before first fall frost |
-| Zone (perennials) | Winters colder than zone_min | Winters warmer than zone_max |
-| Light | Full-sun plant in shade or indoors | Full-sun plant in part sun; shade plant in full sun |
-| Crowding | Closer than 70% of combined spacing at this week's sizes | Tight now, or will crowd later while both are growing |
-| Bad neighbors | Antagonist or shared-disease plant inside min_distance_in while both are planted | They will overlap in time later |
-| Neighbor shade | — | Plant at least 6 in taller is to the south and its midday shadow (0.8 × height) reaches this one |
-| Soil / water | pH off by more than 1; dry-soil plant in clay | pH slightly off; drainage, water or fertility mismatch |
-| Past prime | — | Harvest window over |
+| Spacing | Closer than 70% of the combined spacing at this week's sizes | Tight this week, or will crowd later while both are growing |
+| Bad neighbors | Antagonist or shared-disease plant inside `min_distance_in` while both are planted | They will overlap in time later |
+| Shade | — | A plant at least 6 in taller is to the south and its midday shadow (0.8 × height) reaches this one |
 
-Companion pairs show as a green note and never change the ring color.
+**⚑ Flag (conditions).** The flag comes from the conditions panel: zone, frost date, season length, the bed's sun, soil, pH, fertility, watering, pot size and pets. It appears only when something doesn't suit the plant, and every problem it raises comes with a `fix` text.
 
-**Symbols:**
+| | Red | Amber |
+|---|---|---|
+| Frost | Tender plant out before the last frost | Half-hardy plant out more than 4 weeks early, or any plant earlier than `outdoor_weeks_earliest` |
+| Season | — | Can't mature before the first fall frost |
+| Zone | Winters colder than `zone_min` | Winters warmer than `zone_max` |
+| Light | Full-sun plant in shade or indoors | Part sun for a full-sun plant; full sun for a shade plant |
+| Soil and water | pH off by more than 1; dry-soil plant in clay | pH slightly off; drainage, water, fertility or pot-size mismatch; toxic to pets |
+| Timing | — | Past its prime |
 
-- **Ring:** half the recommended spacing, so the room the plant needs when full grown.
-- **Filled disc:** the plant's canopy this week.
-- **Dotted outline** (shown when a plant is selected): its full-grown size.
-- **Dashed lines:** point to the neighbor causing an amber or red check.
-- **Corner badge:** ✓, ! or ✕, so the status can be read without relying on color.
+Companion pairs show as a green note and never change a color.
+
+**Recommended planting week.** The default is `outdoor_weeks_from_last_frost`, which is the latest frost-safe week the sources give. If the crop can't mature before the first fall frost from that week, the planner moves the week earlier, but never before `outdoor_weeks_earliest`.
 
 ## 3. Growth model
 
@@ -124,7 +125,8 @@ Tender plants die at the first fall frost, half-hardy plants 2 weeks later and h
 |---|---|---|
 | start_method | enum | direct_sow_only, direct_sow_preferred, transplant_ok, transplant_preferred, seed_piece, clove, crown, bare_root_cane, bare_root_tree, potted_shrub, transplant_or_division, transplant_or_cutting, cutting_or_division |
 | indoor_start_weeks_before_last_frost | int | |
-| outdoor_weeks_from_last_frost | int | Default planting week in the planner |
+| outdoor_weeks_from_last_frost | int | Latest frost-safe planting week from the sources (the risk-averse default) |
+| outdoor_weeks_earliest | int | **New.** Earliest week any source allows; used only when the season is too short |
 | germ_soil_temp_min_f, germ_soil_temp_opt_f | int | Filled by a soil thermometer reading |
 | days_to_germination_min/max | int | |
 | sow_depth_in | float | 0 = surface sow |
@@ -169,9 +171,13 @@ Tender plants die at the first fall frost, half-hardy plants 2 weeks later and h
 |---|---|---|
 | companions, antagonists | list | Derived from pair rules |
 | afflictions | list | Links to the pest library |
-| toxic_to_pets | bool | Null = not recorded |
+| toxic_to_pets | bool | From the ASPCA dog and cat lists. Null = not on the lists (unknown) |
 | notes | string | |
-| verified, sources | bool, list | False until checked against a named source |
+| verified | enum | **Changed in v0.3.** full (every key value checked), partial, none |
+| sources | list | Source ids used for this plant (see the `sources` table in the data) |
+| field_sources | object | **New.** For each checked value: which sources back it, plus a note |
+| verify_key_fields, verify_done | list | **New.** The key values for this kind of plant, and which have been checked |
+| changes | list | **New.** Values corrected in v0.3: old, new, source |
 
 ## 5. Pair rules
 | Field | Values |
@@ -195,8 +201,72 @@ Tender plants die at the first fall frost, half-hardy plants 2 weeks later and h
 ## 7. Tools
 These are the 16 tools in `tools` (moisture meter, hygrometer, soil thermometer, min/max thermometer, pH meter, NPK kit, lab test, EC meter, light meter, sun calculator, rain gauge, penetrometer, refractometer, hand lens, sticky traps, smart sensor). Each record lists `measures`, `units`, `fills_fields`, `best_for`, `cost_tier` and `review_url`. Reviews are written for the moisture meter, soil thermometer and pH meter, and the rest are queued.
 
-## 8. Still to do
-- Check every value against a named extension source, then set `verified` and fill in `sources`.
+## 8. Source checks (v0.4)
+
+Key values are checked against university extension sources, plus the ASPCA lists for pet safety. Which values count as key depends on the kind of plant:
+
+| Kind | Key values |
+|---|---|
+| Annual vegetables | pH, spacing, days to maturity, planting week, germination temperature, sow depth, pet safety |
+| Annual herbs | pH, spacing, mature height, sun, pet safety |
+| Perennial herbs | the annual-herb list plus coldest zone |
+| Flowers | pH, spacing, days to maturity, sun, pet safety |
+| Perennial vegetables | pH, spacing, years to first harvest, planting week, coldest zone, pet safety |
+| Fruit | pH, spacing, years to first harvest, chill hours, pollinizer, coldest zone, pet safety |
+| Houseplants | pH, minimum temperature, minimum humidity, light, pet safety |
+
+Germination temperature doesn't apply to potatoes or garlic (planted as pieces and cloves), and planting week doesn't apply to fall-planted garlic.
+
+### When sources disagree
+
+When two sources disagree, the value is the more risk-averse one:
+
+- **Planting week:** the later week, since frost kills young plants. The earliest week any source gives is stored separately, so a long crop in a short season can still be moved earlier.
+- **Spacing:** the wider value.
+- **Days to maturity:** the longer value.
+- **Years to first harvest:** the longer value.
+- **Minimum germination temperature:** the higher value.
+- **Hardiness zone:** the warmer minimum and the cooler maximum.
+- **pH range:** the narrower range.
+- **Pet safety:** a plant counts as toxic if either list says so. A plant on neither list is recorded as unknown.
+
+When three or more sources disagree, the value follows the majority. If there is no majority, the risk-averse rule above decides. Fig pH, for example, came out 6.0–6.5 from five sources.
+
+### Results
+
+- 30 of 50 plants are fully checked and 20 are partly checked.
+- 134 values were changed. Each change, with its source, is listed in Research → Data checks and in each plant's details.
+- Main sources: Colorado State and Purdue (planting groups, germination temperature), Missouri (spacing, days to harvest), UConn (pH), K-State (fruit), Alabama Extension (chill hours), Nebraska (houseplants), UC Master Gardeners (herbs), NC State Plant Toolbox, Minnesota, Penn State and UF/IFAS (zones), and ASPCA (pet safety).
+- Still unchecked:
+  - Kale's germination temperature.
+  - pH for chard, cilantro, dill, pothos and peace lily.
+  - Zones for strawberry, blueberry, apple, pear and peach.
+  - Chill hours for strawberry and raspberry.
+  - Spacing for fig and zinnia.
+  - Most values for Meyer lemon.
+
+## 9. Controls (Settings tab)
+
+All keys can be rebound. Presets copy the conventions of Stardew Valley, The Sims 4, Cities: Skylines and Factorio, and the comparison table is in the Settings tab.
+
+| Action | Default |
+|---|---|
+| Place | Left-click |
+| Inspect | Right-click (can be changed to remove) |
+| Hotbar | 1–0; Tab switches row (Shift+click a slot to pin the selected plant) |
+| Pipette | Q |
+| Remove | Delete or Backspace |
+| Undo / redo | Ctrl+Z / Ctrl+Y |
+| Plant a row | Hold Shift and drag |
+| Off-grid placement | Hold Alt |
+| Grid | G |
+| Step a week | [ and ], or ← and → |
+| Play the season | Space |
+| Rotate the 3D view | , and . |
+| Switch 2D / 3D | V |
+
+## 10. Still to do
+- Finish the partly checked plants, starting with pet toxicity and zones.
 - Replace the illustrations with photos, recording each photo's credit and license.
 - Expand plant coverage to every hardiness zone, including zone 1–3 perennials and zone 10–13 tropical fruit and vegetables.
 - Split varieties out from plants (for example, specific tomato cultivars).
