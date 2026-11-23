@@ -70,6 +70,11 @@ Companion pairs show as a green note and never change a color.
 
 **Recommended planting week.** The default is `outdoor_weeks_from_last_frost`, which is the latest frost-safe week the sources give. If the crop can't mature before the first fall frost from that week, the planner moves the week earlier, but never before `outdoor_weeks_earliest`.
 
+**v0.6 changes to the flag and ring**
+- Season length: red if the crop needs more weeks than are left before its kill week (first fall frost, plus 2 weeks for half-hardy and 6 for hardy crops). Amber if fewer than 2 weeks are left to spare. (It used to be amber.)
+- Grow light (indoors only): none, 8, 12, 14 or 16 h/day. At 14 h or more, full-sun crops pass the light check. Small crops (18 in or shorter) and herbs pass the climate check; taller fruiting crops get amber (large pot, hand pollination). Between 1 and 13 h gives amber.
+- Wording: the spacing warning "Tight with X" is now "Too close to X". Companion notes read "Grows well near X".
+
 ## 3. Growth model
 
 Annuals grow on an S-shaped (logistic) curve:
@@ -193,10 +198,14 @@ Tender plants die at the first fall frost, half-hardy plants 2 weeks later and h
 |---|---|
 | type | insect, mite, mollusk, fungus, water_mold, bacterium, disorder |
 | hosts | Derived from plants |
-| stages | early, mid, late, each with `symptoms`, `photo`, `photo_credit`, `photo_license` |
+| stages | early, mid, late, each with `symptoms`, plus `photo`, `photo_page`, `photo_credit` and `photo_license` where a photo was found |
 | favoring_conditions, prevention | Text |
-| pattern, pattern_color | **New.** Drives the stage illustrations until licensed photos are added |
-| photo_search_url | **New.** Wikimedia Commons search for openly licensed photos |
+| pattern, pattern_color | Drives the stage illustrations, used where no photo exists or a photo fails to load |
+| photo_search_url | Wikimedia Commons search for more photos |
+
+**Photos (v0.5).** 67 of the 90 stage slots (30 afflictions × 3 stages) now have a Wikimedia Commons photo. The list lives in `photos.py`. Commons only hosts openly licensed or public-domain files. Each card shows the photographer and links to the file page, which states the exact license. I recorded the license name only where the search result stated it (USDA ARS public domain, GFDL, CC BY-SA, and "Bugwood.org" for Bugwood uploads). The rest say "see file page", because this environment can't open Commons file pages to read them. I matched photos to stages by each file's description, without viewing the images, so some matches need a human look. Images hotlink a 480 px thumbnail through `Special:FilePath`.
+
+Stages still using illustrations: early stage of downy mildew, blossom end rot, fungus gnats, slugs, tomato hornworm, flea beetles, corn earworm, Mexican bean beetle, root rot and fire blight. Late stage of early blight, cabbage worm, downy mildew, fungus gnats, flea beetles, corn earworm, carrot rust fly, Mexican bean beetle, asparagus beetle, thrips, mealybugs and scale insects. Mid stage of brown rot.|
 
 ## 7. Tools
 These are the 16 tools in `tools` (moisture meter, hygrometer, soil thermometer, min/max thermometer, pH meter, NPK kit, lab test, EC meter, light meter, sun calculator, rain gauge, penetrometer, refractometer, hand lens, sticky traps, smart sensor). Each record lists `measures`, `units`, `fills_fields`, `best_for`, `cost_tier` and `review_url`. Reviews are written for the moisture meter, soil thermometer and pH meter, and the rest are queued.
@@ -277,7 +286,7 @@ All keys can be rebound. Presets copy the conventions of Stardew Valley, The Sim
 
 ## 10. Still to do
 - Finish the partly checked plants, starting with pet toxicity and zones.
-- Replace the illustrations with photos, recording each photo's credit and license.
+- Fill the 23 stage slots that still use illustrations. Have someone look at the 67 photos to confirm each one fits its stage, and copy the exact license from each file page into `photos.py`.
 - Expand plant coverage to every hardiness zone, including zone 1–3 perennials and zone 10–13 tropical fruit and vegetables.
 - Split varieties out from plants (for example, specific tomato cultivars).
 - Add an outcome log so the fit weights can eventually come from a regression.

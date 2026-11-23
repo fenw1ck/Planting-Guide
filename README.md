@@ -33,3 +33,8 @@ Your growing conditions bar is at the top of every tab: zone, frost date, season
 3. Wait a minute or two, and the site will be live at the link above.
 
 You can delete `planting-guide-phase1.zip` from the repo, because everything in it is now built into `index.html`.
+
+## Builds (v0.6)
+The planner holds several named builds (e.g. "Veg garden", "Front flower bed"). Each build has its own conditions, bed size, plants and week. The bar above the planner switches, creates, renames, duplicates and deletes builds. Export saves all builds to a .json file; Import loads them back (useful for moving to another browser or device). Builds live in this browser's storage only: there is no server.
+
+In Find plants, "Place in planner" asks how many. You can add them to the current build, or start a fresh build with that many. Plants go into the first free spots that respect full-size spacing. If they don't all fit, a message says how many did.
