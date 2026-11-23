@@ -1,27 +1,34 @@
 # Planting Guide
 
-A planner for gardens and houseplants. Each plant carries the factors that decide whether it thrives: zone, sun, soil, spacing, depth, water, pruning, support, harvest timing, companions, and pests. You place plant symbols on a 3D plot, and a ring under each one turns green, amber or red to show whether the spot works.
+A planner for gardens and houseplants. Place plants in a bed, move the season slider, and the app shows where each plant will do well, along with the reason for every flag.
 
 **Live site:** https://fenw1ck.github.io/Planting-Guide/
 
-## What's here
+## Tabs
+
+| Tab | What it does |
+| --- | --- |
+| Planner (2D) | Place plants and drag them around. A season slider makes them grow. Click a plant to see every check behind its red, amber or green ring. |
+| Garden view (3D) | Shows the same bed in 3D with a distinct silhouette for each plant type, drawn as seedling, growing, mature or past prime. The bed can be rotated. |
+| Find plants | You set the filters. Each plant gets a fit score for your conditions, and "Use matches in planner" sends the results to the planner. |
+| Pests & diseases | A searchable library of 30 problems, with early, mid and late illustrations, host plants, causes and prevention. |
+| Research | Explains how the app thinks, ranks the factors, says whether a regression is possible, reviews the tools (moisture meters, soil thermometers, pH meters) and lists references. |
+
+Your growing conditions bar is at the top of every tab: zone, frost date, season length, sun, soil pH, soil type, fertility, watering, beds, containers or indoors, and pets. Settings and the bed you build are saved in your browser.
+
+## Files
 
 | File | Purpose |
 | --- | --- |
-| `index.html` | GitHub Pages landing page with an interactive placement-check prototype |
-| `setup-board.sh` | Creates the project board, labels and starter issues with the GitHub CLI |
+| `index.html` | The whole site in one file, with the data built in |
+| `FACTORS.md` | Final factor and field list, factor ranking, placement rules, growth model |
+| `README.md` | This file |
+| `setup-board.sh` | Creates the GitHub project board and starter issues |
 
 ## Publish the site
 
-1. Push `index.html` to the `main` branch.
-2. In the repo, go to **Settings → Pages**, set **Source** to *Deploy from a branch*, choose `main` and `/ (root)`, and click **Save**.
-3. After a minute or two, the site is live at the link above.
+1. Upload `index.html`, `README.md` and `FACTORS.md` to the repo, replacing the old copies.
+2. Go to **Settings → Pages**. Set **Source** to *Deploy from a branch*, choose `main` and `/ (root)`, then click **Save**.
+3. Wait a minute or two, and the site will be live at the link above.
 
-## Create the project board
-
-```bash
-gh auth login --scopes project,repo
-bash setup-board.sh
-```
-
-The script creates 7 workstream labels and 19 issues, then adds them all to a project called *Planting Guide Roadmap*.
+You can delete `planting-guide-phase1.zip` from the repo, because everything in it is now built into `index.html`.
