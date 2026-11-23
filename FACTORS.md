@@ -234,16 +234,26 @@ When three or more sources disagree, the value follows the majority. If there is
 
 ### Results
 
-- 30 of 50 plants are fully checked and 20 are partly checked.
-- 134 values were changed. Each change, with its source, is listed in Research → Data checks and in each plant's details.
+- 39 of 50 plants are fully checked and 11 are partly checked.
+- 141 values were changed. Each change, with its source, is listed in Research → Data checks and in each plant's details.
 - Main sources: Colorado State and Purdue (planting groups, germination temperature), Missouri (spacing, days to harvest), UConn (pH), K-State (fruit), Alabama Extension (chill hours), Nebraska (houseplants), UC Master Gardeners (herbs), NC State Plant Toolbox, Minnesota, Penn State and UF/IFAS (zones), and ASPCA (pet safety).
+- Added in the latest pass:
+  - Kale germination: min 45°F, best 77°F (UCCE Nevada Co.).
+  - Swiss chard pH: 6.0–6.8 (four sources).
+  - Dill pH: 5.5–6.5 confirmed.
+  - Pothos pH: 6.5–7.0 (UF/IFAS).
+  - Zones: strawberry 5–9, blueberry 5–7, apple 5–8, pear 4–8, peach 5–9.
+  - Meyer lemon: zones 9–11, protect below 20°F, self-pollinating, fruit in 1–2 years from a grafted tree.
+- Meyer lemon pollination, years to fruit and spacing come from a nursery (Stark Bro's), because no extension source gave them. These values are labeled as nursery-sourced.
 - Still unchecked:
-  - Kale's germination temperature.
-  - pH for chard, cilantro, dill, pothos and peace lily.
-  - Zones for strawberry, blueberry, apple, pear and peach.
+  - Cilantro pH. No extension source was found, only magazine articles.
+  - Peace lily pH. The UF source gives an implausible value (pH 1–2, likely a typo), so it was not used.
+  - Garlic sow depth.
   - Chill hours for strawberry and raspberry.
-  - Spacing for fig and zinnia.
-  - Most values for Meyer lemon.
+  - Sun for parsley, marigold and nasturtium.
+  - Monstera minimum temperature and humidity.
+  - Fig spacing and years to fruit.
+  - Zinnia spacing.
 
 ## 9. Controls (Settings tab)
 
