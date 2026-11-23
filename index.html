@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Planting Guide</title>
+<style>
+  :root{--bg:#f6f3ea;--ink:#1f2a1c;--muted:#5d6b57;--leaf:#3f7d3a;--soil:#7a5634;--card:#fffdf7;--line:#ddd5c2;--red:#c4453a;--amber:#d69a22;--green:#3f9a47}
+  *{box-sizing:border-box}
+  body{margin:0;font-family:Georgia,"Iowan Old Style",serif;background:var(--bg);color:var(--ink);line-height:1.55}
+  header{background:linear-gradient(180deg,#2f5d2b,#3f7d3a);color:#fbf8ef;padding:56px 24px 48px}
+  .wrap{max-width:960px;margin:0 auto;padding:0 24px}
+  header h1{font-size:2.6rem;margin:0 0 8px;letter-spacing:-.5px}
+  header p{max-width:640px;margin:0;font-size:1.1rem;opacity:.92}
+  nav{display:flex;gap:18px;flex-wrap:wrap;margin-top:24px;font-family:system-ui,sans-serif;font-size:.95rem}
+  nav a{color:#fbf8ef}
+  section{padding:40px 0;border-bottom:1px solid var(--line)}
+  h2{font-size:1.6rem;margin:0 0 6px}
+  .lead{color:var(--muted);margin:0 0 20px;font-family:system-ui,sans-serif}
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:18px 20px}
+  .card h3{margin:0 0 6px;font-size:1.1rem;color:var(--leaf)}
+  .card p{margin:0;font-family:system-ui,sans-serif;font-size:.93rem;color:var(--muted)}
+  table{width:100%;border-collapse:collapse;font-family:system-ui,sans-serif;font-size:.9rem;background:var(--card);border-radius:12px;overflow:hidden}
+  th,td{text-align:left;padding:9px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+  th{background:#ebe5d3;font-weight:600}
+  .legend{display:flex;gap:18px;flex-wrap:wrap;font-family:system-ui,sans-serif;margin-top:14px}
+  .dot{display:inline-block;width:14px;height:14px;border-radius:50%;margin-right:6px;vertical-align:-2px;border:3px solid}
+  #plot{background:#a98a5f;border-radius:12px;display:block;width:100%;max-width:640px;touch-action:none;cursor:grab}
+  .palette{display:flex;gap:10px;margin:14px 0;font-family:system-ui,sans-serif;flex-wrap:wrap}
+  .palette button{border:1px solid var(--line);background:var(--card);border-radius:999px;padding:6px 14px;cursor:pointer;font:inherit}
+  .palette button.on{background:var(--leaf);color:#fff;border-color:var(--leaf)}
+  #msg{font-family:system-ui,sans-serif;color:var(--muted);min-height:1.5em}
+  ol li{margin-bottom:6px;font-family:system-ui,sans-serif}
+  footer{padding:32px 0 48px;color:var(--muted);font-family:system-ui,sans-serif;font-size:.85rem}
+  a{color:var(--leaf)}
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap">
+    <h1>Planting Guide</h1>
+    <p>A planner for gardens and houseplants that knows what each plant needs, so you can see where it will thrive before you dig.</p>
+    <nav><a href="#factors">Factors</a><a href="#prototype">Try the placement check</a><a href="#tools">Tools</a><a href="#roadmap">Roadmap</a><a href="https://github.com/fenw1ck/Planting-Guide">GitHub</a></nav>
+  </div>
+</header>
+
+<main class="wrap">
+<section id="factors">
+  <h2>Seven families of factors</h2>
+  <p class="lead">Each factor becomes a field on a plant or plot record, so the planner can check it automatically.</p>
+  <div class="grid">
+    <div class="card"><h3>Site</h3><p>Hardiness zone, frost dates, season length, sun hours, day length, heat, microclimate, and indoor light and humidity.</p></div>
+    <div class="card"><h3>Soil</h3><p>Texture, drainage, pH, N-P-K, organic matter, salinity, compaction, and soil temperature for germination.</p></div>
+    <div class="card"><h3>Planting</h3><p>Direct sow or transplant, pot size, sowing depth, spacing, and how far roots spread.</p></div>
+    <div class="card"><h3>Care</h3><p>Moisture target and critical watering stages, pruning style, and support type (stake, cage, trellis).</p></div>
+    <div class="card"><h3>Lifecycle and harvest</h3><p>Annual or perennial, days to maturity, single or repeat harvest, harvest window, and succession sowing.</p></div>
+    <div class="card"><h3>Neighbors</h3><p>Companions, antagonists, shared diseases, and shade that changes with height and season, as in Three Sisters timing.</p></div>
+    <div class="card"><h3>Pests and diseases</h3><p>Photos of each affliction at its early, mid and late stage, with what causes it and how to prevent it.</p></div>
+  </div>
+</section>
+
+<section id="prototype">
+  <h2>Placement check prototype</h2>
+  <p class="lead">Pick a plant and click on the bed. The ring under each plant shows its clear zone: red if it would crowd or harm a neighbor, amber if it works but is not ideal, green if it is a good spot.</p>
+  <div class="palette" id="palette"></div>
+  <canvas id="plot" width="640" height="360"></canvas>
+  <p id="msg">Bed: 8 × 4.5 ft. Grid squares are 6 in.</p>
+  <div class="legend">
+    <span><span class="dot" style="border-color:var(--red)"></span>Conflict</span>
+    <span><span class="dot" style="border-color:var(--amber)"></span>Works, not ideal</span>
+    <span><span class="dot" style="border-color:var(--green)"></span>Good spot</span>
+  </div>
+</section>
+
+<section id="tools">
+  <h2>Tools that sharpen the advice</h2>
+  <p class="lead">Optional: measurements that unlock more precise recommendations. Each tool will link to a review comparing several models.</p>
+  <table>
+    <thead><tr><th>Tool</th><th>Measures</th><th>Units</th><th>Most useful for</th></tr></thead>
+    <tbody>
+      <tr><td>Soil moisture meter</td><td>Water in the root zone</td><td>1–10 or % VWC</td><td>Houseplants, containers</td></tr>
+      <tr><td>Hygrometer</td><td>Air humidity</td><td>% RH</td><td>Tropical houseplants, seed starting</td></tr>
+      <tr><td>Soil thermometer</td><td>Soil temperature at seed depth</td><td>°F</td><td>Direct sowing, Three Sisters timing</td></tr>
+      <tr><td>Min/max thermometer</td><td>Coldest and hottest temperatures</td><td>°F</td><td>Frost pockets, greenhouses</td></tr>
+      <tr><td>pH meter or strips</td><td>Acidity or alkalinity</td><td>pH</td><td>Blueberries, brassicas, new beds</td></tr>
+      <tr><td>NPK test kit / lab test</td><td>Nutrients, organic matter</td><td>low–high, ppm</td><td>Heavy feeders, new gardens</td></tr>
+      <tr><td>EC / TDS meter</td><td>Salts, fertilizer strength</td><td>dS/m, ppm</td><td>Containers, hydroponics</td></tr>
+      <tr><td>Light meter</td><td>Light intensity</td><td>lux, PAR</td><td>Houseplants, grow lights</td></tr>
+      <tr><td>Sun calculator</td><td>Direct sun by date</td><td>hours</td><td>Bed layout, shade</td></tr>
+      <tr><td>Rain gauge</td><td>Rainfall</td><td>in</td><td>Watering decisions</td></tr>
+      <tr><td>Penetrometer</td><td>Compaction</td><td>psi</td><td>Clay soils</td></tr>
+      <tr><td>Refractometer</td><td>Fruit sugar</td><td>°Brix</td><td>Harvest timing</td></tr>
+      <tr><td>Hand lens</td><td>Close-up of pests and spores</td><td>none</td><td>Early pest ID</td></tr>
+      <tr><td>Sticky traps</td><td>Flying pest counts</td><td>count/week</td><td>Gnats, whiteflies, thrips</td></tr>
+      <tr><td>Smart sensor / weather station</td><td>Continuous readings</td><td>logged</td><td>Automatic reminders</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section id="roadmap">
+  <h2>Roadmap</h2>
+  <ol>
+    <li>Finalize the factor and field list.</li>
+    <li>Load seed data for 30–50 common vegetables, herbs and houseplants.</li>
+    <li>Write tool review pages, starting with moisture meters, soil thermometers and pH meters.</li>
+    <li>Build a 2D placement checker with a season slider (prototype above).</li>
+    <li>Add an isometric 3D view with distinct plant silhouettes, inspired by farming sims.</li>
+    <li>Build the pest and disease library with photos for each stage.</li>
+  </ol>
+</section>
+</main>
+
+<footer class="wrap">Planting Guide · work in progress · <a href="https://github.com/fenw1ck/Planting-Guide">source on GitHub</a></footer>
+
+<script>
+// Minimal placement-check demo. Units: inches. Bed 96 x 54 in, drawn at 6.667 px/in.
+const PLANTS = {
+  tomato:  {name:"Tomato",  color:"#d9443a", spacing:24, spread:24, sun:"full", tall:true,  antagonists:["potato","fennel"]},
+  pea:     {name:"Pea",     color:"#7fbf4d", spacing:3,  spread:6,  sun:"full", tall:true,  antagonists:["onion","garlic"]},
+  basil:   {name:"Basil",   color:"#2f8f3f", spacing:10, spread:12, sun:"full", tall:false, antagonists:[]},
+  lettuce: {name:"Lettuce", color:"#b6d96b", spacing:8,  spread:10, sun:"part", tall:false, antagonists:[]},
+  onion:   {name:"Onion",   color:"#e0c27a", spacing:4,  spread:6,  sun:"full", tall:false, antagonists:["pea","bean"]},
+  potato:  {name:"Potato",  color:"#a7845a", spacing:12, spread:18, sun:"full", tall:false, antagonists:["tomato"]}
+};
+const SCALE = 640/96, ANTAG_DIST = 24; // in
+const cv = document.getElementById("plot"), ctx = cv.getContext("2d"), msg = document.getElementById("msg");
+const pal = document.getElementById("palette");
+let current = "tomato"; const placed = [];
+Object.entries(PLANTS).forEach(([k,p])=>{const b=document.createElement("button");b.textContent=p.name;b.onclick=()=>{current=k;[...pal.children].forEach(x=>x.classList.remove("on"));b.classList.add("on")};if(k===current)b.classList.add("on");pal.appendChild(b)});
+
+function status(kind,x,y,ignore){
+  const p = PLANTS[kind]; let worst = "green", why = "Good spot.";
+  for (const o of placed){ if (o===ignore) continue; const q = PLANTS[o.kind];
+    const d = Math.hypot(o.x-x,o.y-y);
+    if (d < p.spacing/2 + q.spread/2 || d < q.spacing/2 + p.spread/2) return ["red", `Too close to ${q.name.toLowerCase()} (${Math.round(d)} in apart).`];
+    if ((p.antagonists.includes(o.kind)||q.antagonists.includes(kind)) && d < ANTAG_DIST) return ["red", `${p.name} and ${q.name.toLowerCase()} should be at least ${ANTAG_DIST} in apart.`];
+    // tall plant directly south of a sun lover shades it (north = top of bed)
+    if (q.tall && p.sun==="full" && o.y > y && Math.abs(o.x-x) < 12 && o.y-y < 30) { worst="amber"; why=`${q.name} to the south will shade it later in the season.`; }
+  }
+  return [worst, why];
+}
+function draw(hover){
+  ctx.clearRect(0,0,cv.width,cv.height);
+  ctx.fillStyle="#8a6a43"; ctx.fillRect(0,0,cv.width,cv.height);
+  ctx.strokeStyle="rgba(255,255,255,.12)";
+  for(let i=0;i<=96;i+=6){ctx.beginPath();ctx.moveTo(i*SCALE,0);ctx.lineTo(i*SCALE,cv.height);ctx.stroke();}
+  for(let j=0;j<=54;j+=6){ctx.beginPath();ctx.moveTo(0,j*SCALE);ctx.lineTo(cv.width,j*SCALE);ctx.stroke();}
+  ctx.fillStyle="rgba(255,255,255,.7)";ctx.font="12px system-ui";ctx.fillText("N ↑",8,16);
+  const ringColor={red:"#c4453a",amber:"#d69a22",green:"#3f9a47"};
+  for(const o of placed){const p=PLANTS[o.kind];const [s]=status(o.kind,o.x,o.y,o);
+    ctx.beginPath();ctx.arc(o.x*SCALE,o.y*SCALE,p.spacing/2*SCALE,0,7);ctx.strokeStyle=ringColor[s];ctx.lineWidth=2.5;ctx.stroke();
+    ctx.beginPath();ctx.arc(o.x*SCALE,o.y*SCALE,Math.max(5,p.spread/4*SCALE),0,7);ctx.fillStyle=p.color;ctx.fill();}
+  if(hover){const p=PLANTS[current];const [s,why]=status(current,hover.x,hover.y);
+    ctx.globalAlpha=.6;ctx.beginPath();ctx.arc(hover.x*SCALE,hover.y*SCALE,p.spacing/2*SCALE,0,7);ctx.strokeStyle=ringColor[s];ctx.lineWidth=3;ctx.stroke();
+    ctx.beginPath();ctx.arc(hover.x*SCALE,hover.y*SCALE,Math.max(5,p.spread/4*SCALE),0,7);ctx.fillStyle=p.color;ctx.fill();ctx.globalAlpha=1;
+    msg.textContent=`${p.name}: ${why}`;}
+}
+function pos(e){const r=cv.getBoundingClientRect();const x=(e.clientX-r.left)/r.width*96,y=(e.clientY-r.top)/r.height*54;return {x:Math.round(x/3)*3,y:Math.round(y/3)*3};}
+cv.addEventListener("pointermove",e=>draw(pos(e)));
+cv.addEventListener("pointerleave",()=>draw());
+cv.addEventListener("click",e=>{const h=pos(e);const [s]=status(current,h.x,h.y);if(s==="red"){msg.textContent="That spot conflicts with a neighbor, so the plant was not placed.";return;}placed.push({kind:current,x:h.x,y:h.y});draw(h);});
+draw();
+</script>
+</body>
+</html>
