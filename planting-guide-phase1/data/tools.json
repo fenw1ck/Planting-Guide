@@ -1,0 +1,205 @@
+[
+  {
+    "id": "soil_moisture_meter",
+    "name": "Soil moisture meter",
+    "measures": "Water in the root zone",
+    "units": "1-10 scale or % VWC",
+    "fills_fields": [
+      "moisture_reading"
+    ],
+    "best_for": "Houseplants, containers",
+    "cost_tier": "low",
+    "review_url": null
+  },
+  {
+    "id": "hygrometer",
+    "name": "Hygrometer",
+    "measures": "Air humidity and temperature",
+    "units": "% RH, F",
+    "fills_fields": [
+      "room_humidity"
+    ],
+    "best_for": "Tropical houseplants, seed starting",
+    "cost_tier": "low",
+    "review_url": null
+  },
+  {
+    "id": "soil_thermometer",
+    "name": "Soil thermometer",
+    "measures": "Soil temperature at seed depth",
+    "units": "F",
+    "fills_fields": [
+      "soil_temp"
+    ],
+    "best_for": "Direct sowing; Three Sisters timing",
+    "cost_tier": "low",
+    "review_url": null
+  },
+  {
+    "id": "min_max_thermometer",
+    "name": "Min/max thermometer",
+    "measures": "Coldest and hottest temperatures since reset",
+    "units": "F",
+    "fills_fields": [
+      "microclimate_low",
+      "microclimate_high"
+    ],
+    "best_for": "Frost pockets, greenhouses",
+    "cost_tier": "low",
+    "review_url": null
+  },
+  {
+    "id": "ph_meter",
+    "name": "Soil pH meter or strips",
+    "measures": "Acidity or alkalinity",
+    "units": "pH",
+    "fills_fields": [
+      "soil_ph"
+    ],
+    "best_for": "Blueberries, brassicas, new beds",
+    "cost_tier": "low_medium",
+    "review_url": null
+  },
+  {
+    "id": "npk_test_kit",
+    "name": "Soil test kit (NPK)",
+    "measures": "Nitrogen, phosphorus, potassium",
+    "units": "low/medium/high",
+    "fills_fields": [
+      "soil_n",
+      "soil_p",
+      "soil_k"
+    ],
+    "best_for": "Heavy feeders, poor yields",
+    "cost_tier": "low",
+    "review_url": null
+  },
+  {
+    "id": "lab_soil_test",
+    "name": "Lab soil test",
+    "measures": "pH, nutrients, organic matter, lead",
+    "units": "ppm, %",
+    "fills_fields": [
+      "soil_ph",
+      "soil_n",
+      "soil_p",
+      "soil_k",
+      "soil_om",
+      "soil_lead"
+    ],
+    "best_for": "New gardens, urban soil",
+    "cost_tier": "medium",
+    "review_url": null
+  },
+  {
+    "id": "ec_meter",
+    "name": "EC / TDS meter",
+    "measures": "Salts and fertilizer strength",
+    "units": "dS/m or ppm",
+    "fills_fields": [
+      "soil_ec"
+    ],
+    "best_for": "Containers, hydroponics",
+    "cost_tier": "medium",
+    "review_url": null
+  },
+  {
+    "id": "light_meter",
+    "name": "Light meter (lux or PAR)",
+    "measures": "Light intensity",
+    "units": "lux, umol/m2/s",
+    "fills_fields": [
+      "light_reading"
+    ],
+    "best_for": "Houseplants, grow lights, shady beds",
+    "cost_tier": "low_high",
+    "review_url": null
+  },
+  {
+    "id": "sun_calculator",
+    "name": "Sun path / sun calculator app",
+    "measures": "Hours of direct sun by date",
+    "units": "hours",
+    "fills_fields": [
+      "sun_hours"
+    ],
+    "best_for": "Bed layout and shade",
+    "cost_tier": "free_low",
+    "review_url": null
+  },
+  {
+    "id": "rain_gauge",
+    "name": "Rain gauge",
+    "measures": "Rainfall",
+    "units": "in",
+    "fills_fields": [
+      "rainfall_week"
+    ],
+    "best_for": "Deciding whether to water",
+    "cost_tier": "low",
+    "review_url": null
+  },
+  {
+    "id": "penetrometer",
+    "name": "Penetrometer",
+    "measures": "Soil compaction",
+    "units": "psi",
+    "fills_fields": [
+      "compaction"
+    ],
+    "best_for": "Clay soils, new yards",
+    "cost_tier": "medium",
+    "review_url": null
+  },
+  {
+    "id": "refractometer",
+    "name": "Refractometer",
+    "measures": "Sugar in fruit or sap",
+    "units": "Brix",
+    "fills_fields": [
+      "brix"
+    ],
+    "best_for": "Harvest timing",
+    "cost_tier": "medium",
+    "review_url": null
+  },
+  {
+    "id": "hand_lens",
+    "name": "Hand lens (10x-30x)",
+    "measures": "Close-up view of pests and spores",
+    "units": "none",
+    "fills_fields": [
+      "affliction_observation"
+    ],
+    "best_for": "Early pest ID",
+    "cost_tier": "low",
+    "review_url": null
+  },
+  {
+    "id": "sticky_traps",
+    "name": "Yellow and blue sticky traps",
+    "measures": "Flying pest counts",
+    "units": "count per week",
+    "fills_fields": [
+      "pest_count"
+    ],
+    "best_for": "Gnats, whiteflies, thrips",
+    "cost_tier": "low",
+    "review_url": null
+  },
+  {
+    "id": "smart_sensor",
+    "name": "Smart sensor / weather station",
+    "measures": "Continuous moisture, temperature, light, humidity",
+    "units": "logged series",
+    "fills_fields": [
+      "moisture_reading",
+      "soil_temp",
+      "light_reading",
+      "room_humidity"
+    ],
+    "best_for": "Automatic reminders",
+    "cost_tier": "medium_high",
+    "review_url": null
+  }
+]

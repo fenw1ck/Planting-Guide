@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Plant database · Planting Guide</title>
+<style>
+  :root{--bg:#f6f3ea;--ink:#1f2a1c;--muted:#5d6b57;--leaf:#3f7d3a;--card:#fffdf7;--line:#ddd5c2;--red:#c4453a;--green:#3f9a47}
+  *{box-sizing:border-box}
+  body{margin:0;font-family:system-ui,-apple-system,sans-serif;background:var(--bg);color:var(--ink);line-height:1.5}
+  header{background:linear-gradient(180deg,#2f5d2b,#3f7d3a);color:#fbf8ef;padding:32px 0 28px}
+  .wrap{max-width:1040px;margin:0 auto;padding:0 20px}
+  header h1{font-family:Georgia,serif;margin:0 0 4px;font-size:2rem}
+  header a{color:#fbf8ef}
+  .bar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin:20px 0 12px}
+  input[type=search]{flex:1;min-width:200px;padding:9px 12px;border:1px solid var(--line);border-radius:8px;font:inherit;background:var(--card)}
+  .chips button{border:1px solid var(--line);background:var(--card);border-radius:999px;padding:6px 12px;cursor:pointer;font:inherit;font-size:.9rem}
+  .chips button.on{background:var(--leaf);color:#fff;border-color:var(--leaf)}
+  #count{color:var(--muted);font-size:.9rem;margin-bottom:10px}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 16px;cursor:pointer}
+  .card:hover{border-color:var(--leaf)}
+  .card h3{margin:0;font-size:1.05rem}
+  .sci{color:var(--muted);font-style:italic;font-size:.85rem}
+  .tags{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+  .tag{font-size:.75rem;background:#ebe5d3;border-radius:6px;padding:2px 8px}
+  dialog{border:none;border-radius:14px;max-width:720px;width:92vw;padding:0;background:var(--card);color:var(--ink)}
+  dialog::backdrop{background:rgba(20,30,15,.45)}
+  .dhead{padding:18px 22px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;gap:12px}
+  .dhead h2{margin:0;font-family:Georgia,serif}
+  .dbody{padding:8px 22px 22px;max-height:70vh;overflow:auto}
+  .dbody h4{margin:18px 0 6px;color:var(--leaf);font-size:.95rem}
+  table{width:100%;border-collapse:collapse;font-size:.88rem}
+  td{padding:4px 0;border-bottom:1px solid var(--line);vertical-align:top}
+  td:first-child{color:var(--muted);width:44%}
+  .pill{display:inline-block;margin:2px 4px 2px 0;padding:2px 8px;border-radius:999px;font-size:.8rem}
+  .good{background:#e2f1e2;color:#1e5e25}.bad{background:#f8e1de;color:#8b2a21}
+  .aff{border:1px solid var(--line);border-radius:8px;padding:8px 10px;margin:6px 0;font-size:.85rem}
+  .aff b{display:block}
+  .note{background:#fff6dc;border-radius:8px;padding:8px 10px;font-size:.85rem}
+  button.x{border:none;background:none;font-size:1.4rem;cursor:pointer;color:var(--muted)}
+  footer{padding:30px 0;color:var(--muted);font-size:.8rem}
+</style>
+</head>
+<body>
+<header><div class="wrap">
+  <h1>Plant database</h1>
+  <div><a href="./">← Planting Guide home</a> · Seed data v0.1, typical values not yet verified against sources</div>
+</div></header>
+<main class="wrap">
+  <div class="bar">
+    <input type="search" id="q" placeholder="Search plants, families, pests…">
+  </div>
+  <div class="chips bar" id="cats"></div>
+  <div id="count"></div>
+  <div class="grid" id="grid"></div>
+</main>
+<dialog id="dlg"><div class="dhead"><div><h2 id="dname"></h2><div class="sci" id="dsci"></div></div><button class="x" onclick="dlg.close()" aria-label="Close">×</button></div><div class="dbody" id="dbody"></div></dialog>
+<footer class="wrap">Data files: <a href="data/plants.json">plants.json</a> · <a href="data/plants.csv">plants.csv</a> · <a href="data/afflictions.json">afflictions.json</a> · <a href="data/pair_rules.json">pair_rules.json</a> · <a href="data/tools.json">tools.json</a> · <a href="data/SCHEMA.md">schema</a></footer>
+<script>
+const label = s => s == null ? "—" : String(s).replace(/_/g, " ");
+const range = (a, b, u = "") => a == null ? "—" : (b == null || a === b ? `${a}${u}` : `${a}–${b}${u}`);
+const weeks = w => w == null ? "—" : w === 0 ? "at last frost" : w < 0 ? `${-w} wk before last frost` : `${w} wk after last frost`;
+let plants = [], affs = {}, byId = {}, cat = "all";
+
+Promise.all(["data/plants.json", "data/afflictions.json"].map(u => fetch(u).then(r => r.json())))
+  .then(([p, a]) => {
+    plants = p; p.forEach(x => byId[x.id] = x); a.forEach(x => affs[x.id] = x);
+    const cats = ["all", ...new Set(p.map(x => x.category))];
+    const el = document.getElementById("cats");
+    cats.forEach(c => { const b = document.createElement("button"); b.textContent = c === "all" ? "All" : label(c) + "s";
+      if (c === cat) b.classList.add("on");
+      b.onclick = () => { cat = c; [...el.children].forEach(x => x.classList.remove("on")); b.classList.add("on"); render(); };
+      el.appendChild(b); });
+    render();
+  })
+  .catch(() => { document.getElementById("count").textContent = "Could not load data files. Open this page from the website, not as a local file."; });
+
+document.getElementById("q").addEventListener("input", render);
+
+function render() {
+  const q = document.getElementById("q").value.toLowerCase().trim();
+  const list = plants.filter(p => (cat === "all" || p.category === cat) &&
+    (!q || [p.common_name, p.scientific_name, p.family, ...p.afflictions.map(a => affs[a]?.name)].join(" ").toLowerCase().includes(q)));
+  document.getElementById("count").textContent = `${list.length} of ${plants.length} plants`;
+  const g = document.getElementById("grid"); g.innerHTML = "";
+  list.forEach(p => {
+    const d = document.createElement("div"); d.className = "card"; d.tabIndex = 0;
+    d.innerHTML = `<h3></h3><div class="sci"></div><div class="tags"></div>`;
+    d.querySelector("h3").textContent = p.common_name;
+    d.querySelector(".sci").textContent = p.scientific_name || "";
+    const tags = [label(p.life_cycle), `${label(p.sun_need)} sun`, p.spacing_in ? `${p.spacing_in} in apart` : null,
+      p.mature_height_in ? `${p.mature_height_in} in tall` : null, label(p.harvest_type)].filter(Boolean);
+    tags.forEach(t => { const s = document.createElement("span"); s.className = "tag"; s.textContent = t; d.querySelector(".tags").appendChild(s); });
+    d.onclick = () => open(p); d.onkeydown = e => { if (e.key === "Enter") open(p); };
+    g.appendChild(d);
+  });
+}
+
+function rows(pairs) {
+  return "<table>" + pairs.filter(([, v]) => v !== "—").map(([k, v]) => `<tr><td>${k}</td><td>${v}</td></tr>`).join("") + "</table>";
+}
+function esc(s) { return String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c])); }
+
+function open(p) {
+  document.getElementById("dname").textContent = p.common_name;
+  document.getElementById("dsci").textContent = [p.scientific_name, p.family].filter(Boolean).join(" · ");
+  const name = id => esc(byId[id]?.common_name || id);
+  let h = p.notes ? `<p class="note">${esc(p.notes)}</p>` : "";
+  h += "<h4>Site and soil</h4>" + rows([
+    ["Life cycle", label(p.life_cycle)], ["Hardiness zones", range(p.zone_min, p.zone_max)],
+    ["Frost tolerance", label(p.frost_tolerance)], ["Sun", label(p.sun_need)],
+    ["Light (lux)", range(p.light_lux_min, p.light_lux_max)], ["Min humidity", range(p.humidity_min_pct, null, "%")],
+    ["Min temperature", range(p.temp_min_f, null, " °F")], ["Soil pH", range(p.ph_min, p.ph_max)],
+    ["Soil", label(p.soil_texture_pref)], ["Drainage", label(p.drainage_need)],
+    ["Feeder", label(p.feeder_type) + (p.n_fixer ? " (fixes nitrogen)" : "")]]);
+  h += "<h4>Planting</h4>" + rows([
+    ["Start method", label(p.start_method)],
+    ["Start indoors", p.indoor_start_weeks_before_last_frost ? `${p.indoor_start_weeks_before_last_frost} wk before last frost` : "—"],
+    ["Sow or plant out", weeks(p.outdoor_weeks_from_last_frost)],
+    ["Germination soil temp", p.germ_soil_temp_min_f ? `min ${p.germ_soil_temp_min_f} °F, best ${p.germ_soil_temp_opt_f} °F` : "—"],
+    ["Days to sprout", range(p.days_to_germination_min, p.days_to_germination_max)],
+    ["Depth", p.sow_depth_in === 0 ? "surface (needs light)" : range(p.sow_depth_in, null, " in")],
+    ["Spacing / rows", p.spacing_in ? `${p.spacing_in} in` + (p.row_spacing_in ? ` / ${p.row_spacing_in} in` : "") : "—"],
+    ["Per square foot", range(p.per_sq_ft)], ["Height × spread", p.mature_height_in ? `${p.mature_height_in} × ${p.mature_spread_in} in` : "—"],
+    ["Root depth", range(p.root_depth_in, null, " in")], ["Smallest container", range(p.min_container_gal, null, " gal")]]);
+  h += "<h4>Care and harvest</h4>" + rows([
+    ["Water", `${label(p.water_need)}, ${label(p.moisture_target)}`],
+    ["Critical watering", p.critical_water_stages.map(label).join(", ") || "—"],
+    ["Pruning", label(p.pruning_type)], ["Support", label(p.support_type) + (p.climbing_method ? ` (${label(p.climbing_method)})` : "")],
+    ["Days to maturity", p.days_to_maturity_min ? `${range(p.days_to_maturity_min, p.days_to_maturity_max)} from ${label(p.maturity_from)}` : "—"],
+    ["Harvest", label(p.harvest_type) + (p.harvest_window_days ? `, about ${p.harvest_window_days} days` : "")],
+    ["Years to first harvest", range(p.years_to_first_harvest)], ["Re-sow every", range(p.succession_interval_days, null, " days")],
+    ["Bolts from", p.bolt_trigger.map(label).join(", ") || "—"],
+    ["Toxic to pets", p.toxic_to_pets == null ? "—" : p.toxic_to_pets ? "yes" : "no"]]);
+  if (p.companions.length || p.antagonists.length) {
+    h += "<h4>Neighbors</h4>" + p.companions.map(c => `<span class="pill good">${name(c)}</span>`).join("")
+      + p.antagonists.map(c => `<span class="pill bad">keep apart: ${name(c)}</span>`).join("");
+  }
+  if (p.afflictions.length) {
+    h += "<h4>Pests and diseases</h4>" + p.afflictions.map(a => { const x = affs[a]; if (!x) return "";
+      return `<div class="aff"><b>${esc(x.name)}</b>` + x.stages.map(s => `<div><i>${s.stage}:</i> ${esc(s.symptoms)}</div>`).join("")
+        + `<div><i>prevent:</i> ${esc(x.prevention)}</div></div>`; }).join("");
+  }
+  document.getElementById("dbody").innerHTML = h;
+  document.getElementById("dlg").showModal();
+}
+</script>
+</body>
+</html>
